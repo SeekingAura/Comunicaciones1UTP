@@ -100,7 +100,7 @@ if __name__ == '__main__':
 	salir=False
 	while(not salir):
 		value=recognizeVoz.programa()
-		if value=="Cerrar":
+		if value=="cerrar":
 			salir=True
-		elif value=="Escribir":
+		elif value=="escribir":
 			recognizeVoz.escribirPalabra()
