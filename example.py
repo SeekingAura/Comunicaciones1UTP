@@ -14,72 +14,93 @@ config = {
 }#estableciendo parametros de la base de datos
 # create a Dejavu instance
 djv = Dejavu(config)
-recognizer = FileRecognizer(djv)#creando objeto archivo reconocedor del dejavu con la config dada
-def reconocer
-def menu():
-	os.system("clear")
-	print "Reconocedor de voz -- Menu principal"
-	print "diga 'Escribir' para escribir una sola palabra"
-	print "diga 'Ejecutar' para ejecutar lo escrito"
-	print "diga 'Borrar' para borrar el texto actual"
-	print "diga 'Cerrar' para Salir del programa"
-	os.system('read -s -n 1 -p "Presione cualquier tecla para iniciar la detección de voz"')
-	secs = 5
-	print "reconociendo del microfno durante %d segundos" % (secs)
-	sound = djv.recognize(MicrophoneRecognizer, seconds=secs)
-	if sound is None:
-		print "No se ha reconocido nada del microfono"
-		return None
-	else:
-		print "Del microfono de los %d segundos se a reconocido: %s\n" % (secs, song)
+#djv.recognize(FileRecognizer, "mp3/Sean-Fournier--Falling-For-You.mp3")
+
 
 class compilarVoz(object):
-	def __init__:
+	def __init__(self):
 		self.texto=""
 		self.seconds=5
 		self.soundMicrofone=None
-	def menu(self):
+		# Fingerprint a todos los archivos que hay en una carpeta (banco de conocimiento)
+		djv.fingerprint_directory("mp3", [".mp3"])
+		djv.recognize(MicrophoneRecognizer, seconds=1)
+
+	def programa(self):
 		os.system("clear")
 		print "Reconocedor de voz -- Menu principal"
 		print "diga 'Escribir' para escribir una sola palabra"
 		print "diga 'Ejecutar' para ejecutar lo escrito"
 		print "diga 'Borrar' para borrar el texto actual"
 		print "diga 'Cerrar' para Salir del programa"
+		print "palabra actual %s" % (self.texto)
 		# comando para realizar pause en Linux o ubuntu
 		comando=self.tomarVoz()
 		return comando
 
-	def determinarComando(self):
-		
+	def determinarComando(self, song):
+		temp=""
+		for i in song.song_name:
+			if i=="-":
+				break
+			else:
+				temp+=i
+		return temp
+
 
 	def tomarVoz(self):
-		os.system('read -s -n 1 -p "Presione cualquier tecla para iniciar la detección de voz por microfono"')
-		secs = 5
+		raw_input("presione Enter para iniciar con el reconocimiento por el microfono")
+
 		print "reconociendo del microfono durante %d segundos" % (self.seconds)
 		sound = djv.recognize(MicrophoneRecognizer, seconds=self.seconds)
 		if sound is None:
 			print "No se ha reconocido nada del microfono"
+			raw_input("presione Enter para continuar")
 			return None
 		else:
-			print "Del microfono de los %d segundos se a reconocido: %s\n" % (secs, song)
+			print "Del microfono de los %d segundos se a reconocido: %s\n" % (self.seconds, sound)
+			#print "Del microfono de los %d segundos se a reconocido: %s\n" % (self.seconds, self.determinarComando(sound))
+			raw_input("presione Enter para continuar")
+			return self.determinarComando(sound)
 
+	def escribirPalabra(self):
+		print "procesando para escribir palabra"
+		value=self.tomarVoz()
+		if value is not None:
+			print "la palabra reconocida es %s" % (value)
+			while(True):
+				temp=raw_input("Desea agregarlo? s/n \n")
+				if(temp=="s"):
+					print "Agregado"
+					self.texto+=value
+					break
+				elif(temp=="n"):
+					print "Descartado"
+					break
+				else:
+					print "el comando indicado es incorrecto"
+		else:
+			print "No se ha entendido lo indicado por microfono"
+			temp=raw_input("Desea intentarlo nuevamente? s/n \n")
+			while(True):
+				if(temp=="s"):
+					self.escribirPalabra()
+					break
+				elif(temp=="n"):
+					return
+				else:
+					print "el comando indicado es incorrecto"
 if __name__ == '__main__':
 
 
-	# Fingerprint a todos los archivos que hay en una carpeta (banco de conocimiento)
-	djv.fingerprint_directory("mp3", [".mp3"])
-
+	print("Creando objeto de reconocimiento")
+	recognizeVoz=compilarVoz()
+	raw_input("Todo listo presione enter para continuar")
 	# Or recognize audio from your microphone for `secs` seconds
-	secs = 5
-	print "reconociendo del microfno durante %d segundos" % (secs)
-	song = djv.recognize(MicrophoneRecognizer, seconds=secs)
-
-	if song is None:
-		print "No se ha reconocido nada del microfono"
-	else:
-		print "Del microfono de los %d segundos se a reconocido: %s\n" % (secs, song)
-
-	# Or use a recognizer without the shortcut, in anyway you would like
-
-	song = recognizer.recognize_file("mp3/si-1.mp3")
-	print "Del archivo, se ha reconocido: %s\n" % song
+	salir=False
+	while(not salir):
+		value=recognizeVoz.programa()
+		if value=="Cerrar":
+			salir=True
+		elif value=="Escribir":
+			recognizeVoz.escribirPalabra()
