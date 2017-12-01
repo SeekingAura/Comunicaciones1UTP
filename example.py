@@ -40,7 +40,7 @@ class compilarVoz(object):
 
 	def determinarComando(self, song):
 		temp=""
-		for i in song.song_name:
+		for i in song['song_name']:
 			if i=="-":
 				break
 			else:
@@ -81,15 +81,16 @@ class compilarVoz(object):
 					print "el comando indicado es incorrecto"
 		else:
 			print "No se ha entendido lo indicado por microfono"
-			temp=raw_input("Desea intentarlo nuevamente? s/n \n")
-			while(True):
-				if(temp=="s"):
-					self.escribirPalabra()
-					break
-				elif(temp=="n"):
-					return
-				else:
-					print "el comando indicado es incorrecto"
+
+		while(True):
+			temp=raw_input("Desea agregar mas? s/n \n")
+			if(temp=="s"):
+				self.escribirPalabra()
+				break
+			elif(temp=="n"):
+				return
+			else:
+				print "el comando indicado es incorrecto"
 if __name__ == '__main__':
 
 
@@ -100,7 +101,25 @@ if __name__ == '__main__':
 	salir=False
 	while(not salir):
 		value=recognizeVoz.programa()
-		if value=="cerrar":
-			salir=True
-		elif value=="escribir":
-			recognizeVoz.escribirPalabra()
+		if value is not None:
+			print "se ha recibido el comando %s" % (value)
+			while(True):
+				temp=raw_input("desea procesar? s/n \n")
+				if(temp=="s"):
+					if value=="cerrar":
+						salir=True
+						break
+					elif value=="escribir":
+						recognizeVoz.escribirPalabra()
+						break
+					elif value=="ejecutar":
+						os.system(recognizeVoz.texto)
+						raw_input("presione Enter para continuar")
+						break
+					elif value=="borrar":
+						recognizeVoz.texto=""
+						break
+				elif(temp=="n"):
+					break
+				else:
+					print "el comando indicado es incorrecto"
